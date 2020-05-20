@@ -6,7 +6,7 @@
 int main()
 {
     std::cout << "Hello World!\n";
-	//quick edit to test push
+	//quick edit to test push 3
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
@@ -19,3 +19,4 @@ int main()
 //   4. Use the Error List window to view errors
 //   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
