@@ -6,7 +6,7 @@
 int main()
 {
     std::cout << "Hello World!\n";
-	//blip
+	//blip - This text tests the first NMR program git commit.
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
