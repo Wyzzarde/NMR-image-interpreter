@@ -154,6 +154,9 @@
     <ClCompile Include="GitTestProject.cpp" />
     <ClCompile Include="test_header.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="test_header.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

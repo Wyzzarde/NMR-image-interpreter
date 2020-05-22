@@ -3,10 +3,14 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
+
+#include "test_header.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	int bar = test();
+    std::cout << "Hello World!\n" + std::to_string(bar);
 	//blip - This text tests the first NMR program git commit.
 }
 
