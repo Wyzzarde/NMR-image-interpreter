@@ -14,6 +14,7 @@
 #include <string>
 #include <cerrno>
 
+//This function takes a filename (string) and returns the contents of the file in the form of a string.
 std::string get_file_contents(std::string filename)
 {
 	std::ifstream in(filename, std::ios::in | std::ios::binary);
@@ -30,14 +31,19 @@ std::string get_file_contents(std::string filename)
 	throw(errno);
 }
 
+
 class Bitmap {
 	private:
 		int blah = 9;
 
 	public:
-		std::vector <int> map();
+		std::vector<std::vector<int>> bitmap_values;//cannot preset size
+		int width = 0;
+		int height = 0;
+	
 		Bitmap(std::string);
-
+		
+		
 
 
 	//constructor()
@@ -45,15 +51,63 @@ class Bitmap {
 };
 
 Bitmap::Bitmap(std::string filename) {//constructor
+	//load file in the form of a string
+	std::string imageString = get_file_contents(filename);
+
+	//csv comprehension
+
+	//counts the number of commas and \n
+	int numberOfCommas = std::count(imageString.begin(), imageString.end(), ',');
+	int numberOfLines = std::count(imageString.begin(), imageString.end(), '\n');
+
+	width = (numberOfCommas / numberOfLines)+ 1;
+	height = numberOfLines;
+	std::cout << std::to_string(width) << " - " << std::to_string(height) << "\n";
+	
+	//sets vector size
+	bitmap_values = std::vector<std::vector<int>> (width, std::vector<int>(height));
+	
+	//iterates through the vector array
+	int stringIterator = 0;
+	std::string buff{ "" };
+
+	for (int j = 0; j < height; j++) {
+		for (int i = 0; i < width; i++) {
+			buff = "";
+			for (;;) {
+				if ((imageString[0] != ',') && (imageString[0] != '\\')) {
+					buff = buff + imageString[0];
+					imageString.erase(0, 1);
+				}
+				if (imageString[0] == ',') {
+					imageString.erase(0, 1);
+					break;
+				}
+				if (imageString[0] == '\\') {
+					imageString.erase(0, 2);
+					break;
+				}
+				//imageString.erase(0, 1);
+			}
+			//vector(i,j) = string buff
+			bitmap_values.at(i).at(j) = std::stoi(buff);
+			stringIterator++;
+		}
+		std::cout << std::to_string(stringIterator) << " : ";
+		std::cout << std::to_string(0) << "," << std::to_string(j) << " - " << std::to_string(width) << "\n";
+	}
+
+	std::cout << "vector shape - " << std::to_string(bitmap_values.size()) << "x" << std::to_string(bitmap_values.at(0).size());
+
+	std::cout << "\n" << std::to_string(width) << "x" << std::to_string(height);
 	
 }
 
 
 
 int main()
-{
-	std::string blart = get_file_contents("test_file.txt");
-	std::cout << blart;
+{	
+	Bitmap newMap("test-csv.csv");
 }
 
 

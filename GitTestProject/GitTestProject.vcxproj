@@ -160,6 +160,9 @@
   <ItemGroup>
     <Text Include="test_file.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="test-csv.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
