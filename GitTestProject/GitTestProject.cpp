@@ -71,20 +71,22 @@ Bitmap::Bitmap(std::string filename) {//constructor
 	int stringIterator = 0;
 	std::string buff{ "" };
 
+	int string_iterator = 0;
+
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
 			buff = "";
 			for (;;) {
-				if ((imageString[0] != ',') && (imageString[0] != '\\')) {
-					buff = buff + imageString[0];
-					imageString.erase(0, 1);
+				if ((imageString[string_iterator] != ',') && (imageString[string_iterator] != '\\')) {
+					buff = buff + imageString[string_iterator];
+					string_iterator++;
 				}
-				if (imageString[0] == ',') {
-					imageString.erase(0, 1);
+				if (imageString[string_iterator] == ',') {
+					string_iterator++;
 					break;
 				}
-				if (imageString[0] == '\\') {
-					imageString.erase(0, 2);
+				if (imageString[string_iterator] == '\\') {
+					string_iterator = string_iterator+2;
 					break;
 				}
 				//imageString.erase(0, 1);
