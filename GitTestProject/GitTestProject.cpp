@@ -78,8 +78,9 @@ Bitmap::Bitmap(std::string filename) {//constructor
 			buff = "";
 			for (;;) {
 				if ((imageString[string_iterator] != ',') && (imageString[string_iterator] != '\\')) {
-					buff = buff + imageString[string_iterator];
+					//buff = buff + imageString[string_iterator];
 					string_iterator++;
+					continue;
 				}
 				if (imageString[string_iterator] == ',') {
 					string_iterator++;
@@ -89,11 +90,8 @@ Bitmap::Bitmap(std::string filename) {//constructor
 					string_iterator = string_iterator+2;
 					break;
 				}
-				//imageString.erase(0, 1);
 			}
-			//vector(i,j) = string buff
-			bitmap_values.at(i).at(j) = std::stoi(buff);
-			stringIterator++;
+			//bitmap_values.at(i).at(j) = std::stoi(buff);
 		}
 		std::cout << std::to_string(stringIterator) << " : ";
 		std::cout << std::to_string(0) << "," << std::to_string(j) << " - " << std::to_string(width) << "\n";
