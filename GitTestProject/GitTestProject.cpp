@@ -31,6 +31,31 @@ std::string get_file_contents(std::string filename)
 	throw(errno);
 }
 
+class BmpInputBuffer {
+	//extremely important for this class is that memory does not need to be re-assigned. As such, the length of the string must not be modified.
+	private:
+		std::string buff = "aaa"; // note, stoi will return values ignoring non-number
+		int stringIndex = 0;
+	public:
+		int getValues();
+		void addValues(char stringValue);
+		void bufferReset();
+};
+ 
+int BmpInputBuffer::getValues() {
+	return std::stoi(buff);
+}
+
+void BmpInputBuffer::addValues(char stringValue) {
+	buff[stringIndex] = stringValue;
+	stringIndex++;
+}
+
+void BmpInputBuffer::bufferReset() {
+	buff = "aaa";
+	stringIndex = 0;
+}
+
 
 class Bitmap {
 	private:
@@ -69,25 +94,29 @@ Bitmap::Bitmap(std::string filename) {//constructor
 	
 	//iterates through the vector array
 	int stringIterator = 0;
-	std::string buff{ "" };
+	char buff [3];
 
 	int string_iterator = 0;
+	BmpInputBuffer pixelBuffer;
 
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
-			buff = "";
+			pixelBuffer.bufferReset();
 			for (;;) {
 				if ((imageString[string_iterator] != ',') && (imageString[string_iterator] != '\\')) {
 					//buff = buff + imageString[string_iterator];
+					pixelBuffer.addValues(imageString[string_iterator]);
 					string_iterator++;
 					continue;
 				}
 				if (imageString[string_iterator] == ',') {
 					string_iterator++;
+					pixelBuffer.bufferReset();
 					break;
 				}
 				if (imageString[string_iterator] == '\\') {
 					string_iterator = string_iterator+2;
+					pixelBuffer.bufferReset();
 					break;
 				}
 			}
