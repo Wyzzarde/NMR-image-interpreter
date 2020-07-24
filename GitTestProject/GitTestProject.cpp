@@ -6,9 +6,13 @@
 #include <string>
 #include <vector>
 
+//<include for time>
+#include <cstdio>
+#include <ctime>
+#include <time.h>
+//<\include for time>
 
 #include "test_header.h"
-
 
 #include <fstream>
 #include <string>
@@ -96,35 +100,50 @@ Bitmap::Bitmap(std::string filename) {//constructor
 	int stringIterator = 0;
 	char buff [3];
 
-	int string_iterator = 0;
 	BmpInputBuffer pixelBuffer;
+
+	std::cout << "vector shape - " << std::to_string(bitmap_values.size()) << "x" << std::to_string(bitmap_values.at(0).size()) << "\n";
+
+	//------------Vector assignment timing code start---------------
+	std::clock_t start;
+	double duration;
+	start = std::clock();
+	//---------------------------
 
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
 			pixelBuffer.bufferReset();
 			for (;;) {
-				if ((imageString[string_iterator] != ',') && (imageString[string_iterator] != '\\')) {
-					//buff = buff + imageString[string_iterator];
-					pixelBuffer.addValues(imageString[string_iterator]);
-					string_iterator++;
+				if ((imageString[stringIterator] != ',') && (imageString[stringIterator] != '\n')) {
+					pixelBuffer.addValues(imageString[stringIterator]);
+					stringIterator++;
 					continue;
 				}
-				if (imageString[string_iterator] == ',') {
-					string_iterator++;
-					pixelBuffer.bufferReset();
+				if (imageString[stringIterator] == ',') {
+					stringIterator++;
 					break;
 				}
-				if (imageString[string_iterator] == '\\') {
-					string_iterator = string_iterator+2;
-					pixelBuffer.bufferReset();
+				if (imageString[stringIterator] == '\n') {
+					stringIterator++;
 					break;
 				}
 			}
-			//bitmap_values.at(i).at(j) = std::stoi(buff);
+			//std::cout << std::to_string(stringIterator) << " : ";
+			//std::cout << std::to_string(i) << "," << std::to_string(j) << " - " << std::to_string(width) << "\n";
+			bitmap_values.at(i).at(j) = pixelBuffer.getValues();
+			pixelBuffer.bufferReset();
 		}
-		std::cout << std::to_string(stringIterator) << " : ";
-		std::cout << std::to_string(0) << "," << std::to_string(j) << " - " << std::to_string(width) << "\n";
+		//std::cout << std::to_string(stringIterator) << " : ";
+		//std::cout << std::to_string(0) << "," << std::to_string(j) << " - " << std::to_string(width) << "\n";
 	}
+
+	//---------------Vector Assignment timing code, end---------------------
+	duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
+	std::cout << duration << "\n";
+
+
+
+	//--------------------------------------------------
 
 	std::cout << "vector shape - " << std::to_string(bitmap_values.size()) << "x" << std::to_string(bitmap_values.at(0).size());
 
