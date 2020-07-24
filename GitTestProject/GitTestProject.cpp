@@ -6,11 +6,6 @@
 #include <string>
 #include <vector>
 
-//<include for time>
-#include <cstdio>
-#include <ctime>
-#include <time.h>
-//<\include for time>
 
 #include "test_header.h"
 
@@ -104,12 +99,6 @@ Bitmap::Bitmap(std::string filename) {//constructor
 
 	std::cout << "vector shape - " << std::to_string(bitmap_values.size()) << "x" << std::to_string(bitmap_values.at(0).size()) << "\n";
 
-	//------------Vector assignment timing code start---------------
-	std::clock_t start;
-	double duration;
-	start = std::clock();
-	//---------------------------
-
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
 			pixelBuffer.bufferReset();
@@ -136,14 +125,6 @@ Bitmap::Bitmap(std::string filename) {//constructor
 		//std::cout << std::to_string(stringIterator) << " : ";
 		//std::cout << std::to_string(0) << "," << std::to_string(j) << " - " << std::to_string(width) << "\n";
 	}
-
-	//---------------Vector Assignment timing code, end---------------------
-	duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
-	std::cout << duration << "\n";
-
-
-
-	//--------------------------------------------------
 
 	std::cout << "vector shape - " << std::to_string(bitmap_values.size()) << "x" << std::to_string(bitmap_values.at(0).size());
 
