@@ -190,6 +190,62 @@ void Bitmap::printMapToCSV (std::string filename) {
 
 ////---------------------------------------------------------------------------------------------------------
 
+//This section will contain temporary code that will prototype the code for the comprehension
+
+void test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
+	//These vectors contain the x and y coordinates 
+	std::vector<std::vector<int>> line_vectors_x;
+	std::vector<std::vector<int>> line_vectors_y;
+
+	double line_r_value = 0;
+	double line_b = 0;
+	double line_a = 0;
+
+	std::vector<int> initial_vector_x = { initial_x };
+	std::vector<int> initial_vector_y = { initial_y };
+
+	line_vectors_x.push_back(initial_vector_x);
+	line_vectors_y.push_back(initial_vector_y);
+
+	for (int loop_number = 0;;loop_number++) {//temp placeholder in for loop
+		
+		//find the last vector in the vector list
+		int lastIndex = line_vectors_x.size() - 1;
+		std::vector<int>& lineEndVectorX = line_vectors_x.at(lastIndex);
+		std::vector<int>& lineEndVectorY = line_vectors_y.at(lastIndex);
+
+		line_vectors_x.push_back(std::vector<int>());
+		line_vectors_y.push_back(std::vector<int>());
+
+		for (int n = 0; n < lineEndVectorX.size(); n++) {
+
+			//get values of x and y at the point being evaluated
+			int x = lineEndVectorX.at(n);
+			int y = lineEndVectorY.at(n);
+
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					int testXCoordinate = x + i;
+					int testYCoordinate = y + j;
+
+					int testCoordinateValue = inputMap.getValueAt(testXCoordinate, testYCoordinate);
+					//check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector (list we are currently eval on) and previous coords
+					//note that nested ifs could be replaced by && statements, but are done like this to improve readability
+					if (testCoordinateValue >= inkThreshold) {
+						// check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector(list we are currently eval on) and previous coords
+						//note that nested ifs could be replaced by && statements, but are done like this to improve readability
+						if (checkForCoordinatesRepeat()) {
+
+						}
+					}
+				}
+			}
+
+		}
+	}
+}
+
+//---------------------------------------------------------------------------------------------------------
 int inkThreshold = 120;
 //int bufferSize = 5;
 
