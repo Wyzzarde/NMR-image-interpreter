@@ -153,11 +153,9 @@ void Bitmap::printMapToCSV (std::string filename) {
 	std::string cellBuffer;
 	cellBuffer.reserve(10);
 
-	int iterator_number = 0;
 
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			iterator_number++;
 			//std::cout << std::to_string(x) << "," << std::to_string(y) << "\n";
 			cellBuffer = std::to_string(bitmap_values.at(x).at(y));
 			for (int i = 0; i < cellBuffer.size(); i++) {
@@ -192,7 +190,10 @@ void Bitmap::printMapToCSV (std::string filename) {
 
 //This section will contain temporary code that will prototype the code for the comprehension
 
-void test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
+
+
+
+std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 	//These vectors contain the x and y coordinates 
 	std::vector<std::vector<int>> line_vectors_x;
 	std::vector<std::vector<int>> line_vectors_y;
@@ -211,17 +212,39 @@ void test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 		
 		//find the last vector in the vector list
 		int lastIndex = line_vectors_x.size() - 1;
-		std::vector<int>& lineEndVectorX = line_vectors_x.at(lastIndex);
-		std::vector<int>& lineEndVectorY = line_vectors_y.at(lastIndex);
+		
+		//spread_vector
+		
+		std::vector<int>& spreadVectorX = line_vectors_x.at(lastIndex);
+		std::vector<int>& spreadVectorY = line_vectors_y.at(lastIndex);
+		
+		//previous vector - include if first round
 
+		int prevVectorIndex = 0;
+
+		if (loop_number != 0) {
+			prevVectorIndex = lastIndex-1;
+		}
+		else {
+			prevVectorIndex = lastIndex;
+		}
+
+		std::vector<int>& previousVectorX = line_vectors_x.at(prevVectorIndex);
+		std::vector<int>& previousVectorY = line_vectors_y.at(prevVectorIndex);
+
+		//create vector buffer
 		line_vectors_x.push_back(std::vector<int>());
 		line_vectors_y.push_back(std::vector<int>());
 
-		for (int n = 0; n < lineEndVectorX.size(); n++) {
+		//vector buffer
+		std::vector<int>& bufferVectorX = line_vectors_x.at(lastIndex);
+		std::vector<int>& bufferVectorY = line_vectors_y.at(lastIndex);
+
+		for (int n = 0; n < spreadVectorX.size(); n++) {
 
 			//get values of x and y at the point being evaluated
-			int x = lineEndVectorX.at(n);
-			int y = lineEndVectorY.at(n);
+			int x = spreadVectorX.at(n);
+			int y = spreadVectorY.at(n);
 
 			for (int i = -1; i <= 1; i++) {
 				for (int j = -1; j <= 1; j++) {
@@ -234,12 +257,59 @@ void test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 					if (testCoordinateValue >= inkThreshold) {
 						// check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector(list we are currently eval on) and previous coords
 						//note that nested ifs could be replaced by && statements, but are done like this to improve readability
-						if (checkForCoordinatesRepeat()) {
-
+						if (checkForCoordinatesRepeat(spreadVectorX, spreadVectorY, testXCoordinate, testYCoordinate == false)) {
+							if (checkForCoordinatesRepeat(previousVectorX, previousVectorY, testXCoordinate, testYCoordinate == false)) {
+								if (checkForCoordinatesRepeat(bufferVectorX, bufferVectorY, testXCoordinate, testYCoordinate == false)) {
+									bufferVectorX.push_back(testXCoordinate);
+									bufferVectorY.push_back(testYCoordinate);
+								}
+							}
 						}
 					}
+
+					//after this, the new coordinate has been added to the latest vector
+					
 				}
 			}
+
+		}
+	}
+
+	return (line_vectors_x, line_vectors_y);
+}
+
+int first_pixel_detect(Bitmap inputMap) {
+	for (int x = 0; x < inputMap.width; x++) {
+		//std::cout << std::to_string(x) << "\n";
+		for (int y = 0; y < inputMap.height; y++) {
+			if (inputMap.getValueAt(x, y) >= inkThreshold) {
+				return (x, y);
+			}
+		}
+	}
+}
+
+void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vectors) {
+	
+	std::string outputString;
+	int stringPointRef = 0;
+	int allVectorsSize = 0;
+
+	for (int i = 0; i <= vectors.size(); i++) {
+		for (int j = 0; j <= vectors.at(i).size(); j++) {
+			allVectorsSize++;
+		}
+	}
+
+	char* preStringChar;
+	preStringChar = new char[(allVectorsSize + 1) * 4];
+
+	std::string cellBuffer;
+	cellBuffer.reserve(10);
+
+	for (int i = 0; i <= vectors.size(); i++) {
+		for (int j = 0; j <= vectors.at(i).size(); j++) {
+			cellBuffer = std::to_string(vectors.at(i).at(j));
 
 		}
 	}
@@ -394,27 +464,30 @@ void detect_line_pixels(int initial_x, int initial_y, Bitmap inputMap) {
 	//end for (;;)
 }
 
+
 void method_of_least_squares(Bitmap inputMap) {//need to add to bitmap class line containers. 
 
 }
 
-int first_pixel_detect(Bitmap inputMap) {
-	for (int x = 0; x < inputMap.width; x++) {
-		//std::cout << std::to_string(x) << "\n";
-		for (int y = 0; y < inputMap.height; y++) {
-			if (inputMap.getValueAt(x, y) >= inkThreshold) {
-				return (x, y);
-			}
-		}
-	}
-}
+
+ //detect first pixel, complete
+
 
 int main()
 {
 	Bitmap newMap("test-csv.csv");
-	highlightEdges(newMap);
-	std::cout << std::to_string(newMap.getValueAt(0,0)) << "-1\n";
-	newMap.printMapToCSV("csv_edges.csv");
+	//highlightEdges(newMap);
+	//std::cout << std::to_string(newMap.getValueAt(0,0)) << "-1\n";
+	//newMap.printMapToCSV("csv_edges.csv");
+	
+	int firstXCoord = 0;
+	int firstYCoord = 0;
+
+	firstXCoord, firstYCoord = first_pixel_detect(newMap);
+
+
+
+
 
 }
 
