@@ -251,8 +251,8 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 		
 		//spread_vector
 		
-		std::vector<int>& spreadVectorX = line_vectors_x.at(lastIndex);
-		std::vector<int>& spreadVectorY = line_vectors_y.at(lastIndex);
+		std::vector<int> spreadVectorX = line_vectors_x.at(lastIndex);
+		std::vector<int> spreadVectorY = line_vectors_y.at(lastIndex);
 		
 		if (spreadVectorX.size() == 0) {
 			line_vectors_x.pop_back();
@@ -271,16 +271,16 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 			prevVectorIndex = lastIndex;
 		}
 
-		std::vector<int>& previousVectorX = line_vectors_x.at(prevVectorIndex);
-		std::vector<int>& previousVectorY = line_vectors_y.at(prevVectorIndex);
+		std::vector<int> previousVectorX = line_vectors_x.at(prevVectorIndex);
+		std::vector<int> previousVectorY = line_vectors_y.at(prevVectorIndex);
 
 		//create vector buffer
 		line_vectors_x.push_back(std::vector<int>());
 		line_vectors_y.push_back(std::vector<int>());
 
 		//vector buffer
-		std::vector<int>& bufferVectorX = line_vectors_x.at(lastIndex);
-		std::vector<int>& bufferVectorY = line_vectors_y.at(lastIndex);
+		std::vector<int> bufferVectorX = line_vectors_x.at(lastIndex);
+		std::vector<int> bufferVectorY = line_vectors_y.at(lastIndex);
 
 		//<testcode>
 		int loopTwo = 0;
