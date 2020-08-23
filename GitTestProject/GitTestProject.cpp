@@ -10,6 +10,34 @@
 #include "test_header.h"
 #include <cerrno>
 
+
+//global variables - yes they are evil. They are here so that they can be set by the user.
+// I am aware they should be values, but wth.
+
+int inkThreshold = 120;
+
+//top height functions
+bool checkIntegerVectorForValue(std::vector<int> vector_check, int valueToCheck) {
+	for (int i = 0; i <= vector_check.size(); i++) {
+		if (vector_check.at(i) == valueToCheck) {
+			return (true);
+		}
+	}
+	return (false);
+}
+
+bool checkForCoordinatesRepeat(std::vector<int> x_coords, std::vector<int> y_coords, int x, int y) {
+	if (checkIntegerVectorForValue(x_coords, x) == true && checkIntegerVectorForValue(y_coords, y) == true) {
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+
 //This function takes a filename (string) and returns the contents of the file in the form of a string.
 std::string get_file_contents(std::string filename)
 {
@@ -153,7 +181,6 @@ void Bitmap::printMapToCSV (std::string filename) {
 	std::string cellBuffer;
 	cellBuffer.reserve(10);
 
-
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			//std::cout << std::to_string(x) << "," << std::to_string(y) << "\n";
@@ -193,7 +220,7 @@ void Bitmap::printMapToCSV (std::string filename) {
 
 
 
-std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
+std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 	//These vectors contain the x and y coordinates 
 	std::vector<std::vector<int>> line_vectors_x;
 	std::vector<std::vector<int>> line_vectors_y;
@@ -208,8 +235,17 @@ std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y,
 	line_vectors_x.push_back(initial_vector_x);
 	line_vectors_y.push_back(initial_vector_y);
 
+	//<testcode>
+	int loopOne = 0;
+	//</testcode>
+
 	for (int loop_number = 0;;loop_number++) {//temp placeholder in for loop
-		
+
+		//<testcode>
+		std::cout << "loopOne - " << std::to_string(loopOne) << "\n";
+		loopOne++;
+		//</testcode>
+
 		//find the last vector in the vector list
 		int lastIndex = line_vectors_x.size() - 1;
 		
@@ -218,6 +254,12 @@ std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y,
 		std::vector<int>& spreadVectorX = line_vectors_x.at(lastIndex);
 		std::vector<int>& spreadVectorY = line_vectors_y.at(lastIndex);
 		
+		if (spreadVectorX.size() == 0) {
+			line_vectors_x.pop_back();
+			line_vectors_y.pop_back();
+			break;
+		}
+
 		//previous vector - include if first round
 
 		int prevVectorIndex = 0;
@@ -240,7 +282,17 @@ std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y,
 		std::vector<int>& bufferVectorX = line_vectors_x.at(lastIndex);
 		std::vector<int>& bufferVectorY = line_vectors_y.at(lastIndex);
 
+		//<testcode>
+		int loopTwo = 0;
+		//</testcode>
+
 		for (int n = 0; n < spreadVectorX.size(); n++) {
+		
+			//<testcode>
+			std::cout << "loopTwo - " << std::to_string(loopTwo) << "\n";
+			loopTwo++;
+			//</testcode>
+
 
 			//get values of x and y at the point being evaluated
 			int x = spreadVectorX.at(n);
@@ -254,7 +306,7 @@ std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y,
 					int testCoordinateValue = inputMap.getValueAt(testXCoordinate, testYCoordinate);
 					//check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector (list we are currently eval on) and previous coords
 					//note that nested ifs could be replaced by && statements, but are done like this to improve readability
-					if (testCoordinateValue >= inkThreshold) {
+					if (testCoordinateValue <= inkThreshold) {
 						// check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector(list we are currently eval on) and previous coords
 						//note that nested ifs could be replaced by && statements, but are done like this to improve readability
 						if (checkForCoordinatesRepeat(spreadVectorX, spreadVectorY, testXCoordinate, testYCoordinate == false)) {
@@ -275,15 +327,20 @@ std::vector<std::vector<int>> test_line_detection (int initial_x, int initial_y,
 		}
 	}
 
-	return (line_vectors_x, line_vectors_y);
+	std::vector<std::vector<std::vector<int>>> returnVector = {line_vectors_x, line_vectors_y};
+
+	return (returnVector);
 }
 
-int first_pixel_detect(Bitmap inputMap) {
+std::vector<int> first_pixel_detect(Bitmap inputMap) {
 	for (int x = 0; x < inputMap.width; x++) {
 		//std::cout << std::to_string(x) << "\n";
 		for (int y = 0; y < inputMap.height; y++) {
-			if (inputMap.getValueAt(x, y) >= inkThreshold) {
-				return (x, y);
+			if (inputMap.getValueAt(x, y) <= inkThreshold) {
+				
+				std::vector<int> returnVector = { x,y };
+
+				return (returnVector);
 			}
 		}
 	}
@@ -295,28 +352,52 @@ void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vecto
 	int stringPointRef = 0;
 	int allVectorsSize = 0;
 
-	for (int i = 0; i <= vectors.size(); i++) {
-		for (int j = 0; j <= vectors.at(i).size(); j++) {
+	for (int i = 0; i < vectors.size(); i++) {
+		for (int j = 0; j < vectors.at(i).size(); j++) {
 			allVectorsSize++;
 		}
 	}
 
+
+	
 	char* preStringChar;
-	preStringChar = new char[(allVectorsSize + 1) * 4];
+	int preStringCharLength = (allVectorsSize + 1) * 4;
+	preStringChar = new char[preStringCharLength];
+	int arrayIterator = 0;
+
 
 	std::string cellBuffer;
 	cellBuffer.reserve(10);
 
-	for (int i = 0; i <= vectors.size(); i++) {
-		for (int j = 0; j <= vectors.at(i).size(); j++) {
-			cellBuffer = std::to_string(vectors.at(i).at(j));
 
+	for (int i = 0; i < vectors.size(); i++) {
+		for (int j = 0; j < vectors.at(i).size(); j++) {
+			cellBuffer = std::to_string(vectors.at(i).at(j));
+			for (int n = 0; n < cellBuffer.size(); n++) {
+				preStringChar[arrayIterator] = cellBuffer[n];
+				arrayIterator++;
+			}
+			if (j < vectors.at(i).size() - 1) {
+				preStringChar[arrayIterator] = ',';
+				arrayIterator++;
+			}
+			if (j == vectors.at(i).size() - 1) {
+				preStringChar[arrayIterator] = '\n';
+			}
 		}
 	}
+
+	std::cout << "done char_array";
+	std::string VectorOutputString = std::string(preStringChar);
+
+	std::ofstream outFile;
+	outFile.open(filename);
+	outFile << VectorOutputString;
+	outFile.close();
 }
 
 //---------------------------------------------------------------------------------------------------------
-int inkThreshold = 120;
+
 //int bufferSize = 5;
 
 void highlightEdges(Bitmap &inputMap) {
@@ -366,24 +447,7 @@ void testAlgorithms(Bitmap &map) {
 
 }
 
-bool checkIntegerVectorForValue(std::vector<int> vector_check, int valueToCheck) {
-	for (int i = 0; i <= vector_check.size(); i++) {
-		if (vector_check.at(i) == valueToCheck) {
-			return (true);
-		}
-	}
-	return (false);
-}
 
-bool checkForCoordinatesRepeat(std::vector<int> x_coords, std::vector<int> y_coords, int x, int y) {
-	if (checkIntegerVectorForValue(x_coords, x) == true && checkIntegerVectorForValue(y_coords, y) == true) {
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 void insertVectorEraseSource(std::vector<int> &receiveVector, std::vector<int> &sourceVector) {
 	receiveVector.insert(receiveVector.end(), sourceVector.begin(), sourceVector.end());
@@ -423,7 +487,7 @@ void detect_line_pixels(int initial_x, int initial_y, Bitmap inputMap) {
 					int testCoordinateValue = inputMap.getValueAt(testXCoordinate, testYCoordinate);
 					//check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector (list we are currently eval on) and previous coords
 					//note that nested ifs could be replaced by && statements, but are done like this to improve readability
-					if (testCoordinateValue >= inkThreshold) {
+					if (testCoordinateValue <= inkThreshold) {
 						if (checkForCoordinatesRepeat(spread_vector_x, spread_vector_y, testXCoordinate, testYCoordinate) == false) {//evaluate checkIntegerVectorForValue
 							if (checkForCoordinatesRepeat(previous_coords_x, previous_coords_y, testXCoordinate, testYCoordinate) == false) {
 								if (checkForCoordinatesRepeat(coordinates_buffer_x, coordinates_buffer_y, testXCoordinate, testYCoordinate) == false) {
@@ -483,11 +547,20 @@ int main()
 	int firstXCoord = 0;
 	int firstYCoord = 0;
 
-	firstXCoord, firstYCoord = first_pixel_detect(newMap);
+	std::vector<int> firstPixelCoord  = first_pixel_detect(newMap);
 
+	firstXCoord = firstPixelCoord.at(0);
+	firstYCoord = firstPixelCoord.at(1);
 
+	std::vector<std::vector<std::vector<int>>> sq_vectors = test_line_detection(firstXCoord, firstYCoord, newMap);
+	
+	std::vector<std::vector<int>> test_sqvectorX = sq_vectors.at(0);
+	std::vector<std::vector<int>> test_sqvectorY = sq_vectors.at(1);
 
-
+	//std::vector<std::vector<int>> test_sqvectorX, test_sqvectorY = test_line_detection(firstXCoord, firstYCoord, newMap);
+	
+	printVectorsToCSV("output_line_vectorX.csv", test_sqvectorX);
+	printVectorsToCSV("output_line_vectorY.csv", test_sqvectorY);
 
 }
 
