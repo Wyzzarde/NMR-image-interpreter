@@ -37,7 +37,6 @@ bool checkForCoordinatesRepeat(std::vector<int> x_coords, std::vector<int> y_coo
 }
 
 
-
 //This function takes a filename (string) and returns the contents of the file in the form of a string.
 std::string get_file_contents(std::string filename)
 {
@@ -54,6 +53,9 @@ std::string get_file_contents(std::string filename)
 	}
 	throw(errno);
 }
+
+//////////--------------------------------------------------------------------------------------------------
+//CLASS:Bitmap Input buffer
 
 class BmpInputBuffer {
 	//extremely important for this class is that memory does not need to be re-assigned. As such, the length of the string must not be modified.
@@ -81,6 +83,7 @@ void BmpInputBuffer::bufferReset() {
 }
 
 //////////-------------------------------------------------------------------------------------------------
+//CLASS:BITMAP
 
 class Bitmap {
 	private:
@@ -214,11 +217,9 @@ void Bitmap::printMapToCSV (std::string filename) {
 }
 
 ////---------------------------------------------------------------------------------------------------------
+//MoLS CODE
 
-//This section will contain temporary code that will prototype the code for the comprehension
-
-
-
+//Detect contiguos black pixels. Output is 2 matrices (vector^2) contained in a vector. 
 
 std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 	//These vectors contain the x and y coordinates 
@@ -321,22 +322,11 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 	return (returnVector);
 }
 
-std::vector<int> first_pixel_detect(Bitmap inputMap) {
-	for (int x = 0; x < inputMap.width; x++) {
-		//std::cout << std::to_string(x) << "\n";
-		for (int y = 0; y < inputMap.height; y++) {
-			if (inputMap.getValueAt(x, y) <= inkThreshold) {
-				
-				std::vector<int> returnVector = { x,y };
-
-				return (returnVector);
-			}
-		}
-	}
-}
+//--------------------------------------------------------------------------------------------------------
+//Utility functions
 
 void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vectors) {
-	
+
 	std::string outputString;
 	int stringPointRef = 0;
 	int allVectorsSize = 0;
@@ -348,7 +338,7 @@ void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vecto
 	}
 
 
-	
+
 	char* preStringChar;
 	int preStringCharLength = (allVectorsSize + 1) * 4;
 	preStringChar = new char[preStringCharLength];
@@ -387,139 +377,26 @@ void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vecto
 	outFile << VectorOutputString;
 	outFile.close();
 }
-
-//---------------------------------------------------------------------------------------------------------
-
-//int bufferSize = 5;
-
-void highlightEdges(Bitmap &inputMap) {
-
+std::vector<int> first_pixel_detect(Bitmap inputMap) {
 	for (int x = 0; x < inputMap.width; x++) {
 		//std::cout << std::to_string(x) << "\n";
 		for (int y = 0; y < inputMap.height; y++) {
-			int pointValue = inputMap.getValueAt(x, y);
-			bool edge = false;
-			if (pointValue <= inkThreshold) {
-				for (int i = -1; i <= 1; i++) {
-					for (int j = -1; j <= 1; j++) {
+			if (inputMap.getValueAt(x, y) <= inkThreshold) {
 
-						int testPointVal = inputMap.getValueAt(x + i, y + j);
+				std::vector<int> returnVector = { x,y };
 
-						if (testPointVal >= 120 && testPointVal < 300) {
-							if (!(i == 0 && j == 0)) {
-								edge = true;
-								break;
-							}
-						}
-					
-					}
-				}
-
-			}
-			if (edge != true && pointValue <= inkThreshold) {
-				inputMap.changeValueAt(x, y, 301);
-			}
-		}
-	}
-
-	for (int x = 0; x < inputMap.width; x++) {
-		for (int y = 0; y < inputMap.height; y++) {
-			
-			int pointValue = inputMap.getValueAt(x, y);
-			
-			if (pointValue > 120) {
-				inputMap.changeValueAt(x, y, 254);
+				return (returnVector);
 			}
 		}
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------
 
 
 void testAlgorithms(Bitmap &map) {
 
 }
-
-
-
-void insertVectorEraseSource(std::vector<int> &receiveVector, std::vector<int> &sourceVector) {
-	receiveVector.insert(receiveVector.end(), sourceVector.begin(), sourceVector.end());
-	sourceVector.erase(sourceVector.begin(), sourceVector.end());
-}
-
-void detect_line_pixels(int initial_x, int initial_y, Bitmap inputMap) {
-	//spread vector contains pixels on which spread evaluations should be conducted, i.e. the pixels on the edge of the line that has been evaluated thus far.
-	std::vector<int> spread_vector_x;
-	std::vector<int> spread_vector_y;
-
-	std::vector<int> line_coords_x;
-	std::vector<int> line_coords_y;
-
-	std::vector<int> previous_coords_x;
-	std::vector<int> previous_coords_y;
-
-	std::vector<int> coordinates_buffer_x;
-	std::vector<int> coordinates_buffer_y;
-
-	double line_r_value = 0;
-	double line_b = 0;
-	double line_a = 0;
-
-	for (;;) { //at some point some kind of sanity check will have to be implemented, also need to have an end condition when spread coord is empty (while(spread_coords.size() > 0) loop replace for?)
-		for (int n = 0; n <= spread_vector_x.size(); n++) {
-			//look at surrounding pixels, evaluate whether black. If black, add to spread vector, else dont. previous_coords->line_coords, fhift all from this loop of (;;) into previous_coords
-
-			int x = spread_vector_x.at(n);
-			int y = spread_vector_y.at(n);
-
-			for (int i = -1; i <= 1; i++) {
-				for (int j = -1; j <= 1; j++) {
-					int testXCoordinate = x + i;
-					int testYCoordinate = y + j;
-					
-					int testCoordinateValue = inputMap.getValueAt(testXCoordinate, testYCoordinate);
-					//check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector (list we are currently eval on) and previous coords
-					//note that nested ifs could be replaced by && statements, but are done like this to improve readability
-					if (testCoordinateValue <= inkThreshold) {
-						if (checkForCoordinatesRepeat(spread_vector_x, spread_vector_y, testXCoordinate, testYCoordinate) == false) {//evaluate checkIntegerVectorForValue
-							if (checkForCoordinatesRepeat(previous_coords_x, previous_coords_y, testXCoordinate, testYCoordinate) == false) {
-								if (checkForCoordinatesRepeat(coordinates_buffer_x, coordinates_buffer_y, testXCoordinate, testYCoordinate) == false) {
-									coordinates_buffer_x.push_back(testXCoordinate);
-									coordinates_buffer_y.push_back(testYCoordinate);
-								}
-							}
-						}
-					}
-				}
-			}
-
-		} //here each round of evalution is complete, and below buffer moving takes place
-
-
-
-		// after all spread coords have been evaluated, and coord buffers filled, move each buffer to the buffer above it. line_coords <- previous_coords <- spread_vector <- buffer
-		line_coords_x.insert(line_coords_x.end(), previous_coords_x.begin(), previous_coords_x.end());
-		
-		//lineCoords <- previousCoords
-		insertVectorEraseSource(line_coords_x, previous_coords_x);
-		insertVectorEraseSource(line_coords_y, previous_coords_y);
-		
-		//previous_coords <- spread_vector
-		insertVectorEraseSource(previous_coords_x, spread_vector_x);
-		insertVectorEraseSource(previous_coords_y, spread_vector_y);
-
-		//if source vector 
-		if (coordinates_buffer_x.size() == 0) {
-			break;
-		}
-
-		//spread_vector <- buffer
-		insertVectorEraseSource(spread_vector_x, coordinates_buffer_x);
-		insertVectorEraseSource(spread_vector_y, coordinates_buffer_y);
-
-	}
-	//end for (;;)
-}
-
 
 void method_of_least_squares(Bitmap inputMap) {//need to add to bitmap class line containers. 
 
