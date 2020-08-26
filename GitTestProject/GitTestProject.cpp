@@ -18,7 +18,7 @@ int inkThreshold = 120;
 
 //top height functions
 bool checkIntegerVectorForValue(std::vector<int> vector_check, int valueToCheck) {
-	for (int i = 0; i <= vector_check.size(); i++) {
+	for (int i = 0; i < vector_check.size(); i++) {
 		if (vector_check.at(i) == valueToCheck) {
 			return (true);
 		}
@@ -28,11 +28,11 @@ bool checkIntegerVectorForValue(std::vector<int> vector_check, int valueToCheck)
 
 bool checkForCoordinatesRepeat(std::vector<int> x_coords, std::vector<int> y_coords, int x, int y) {
 	if (checkIntegerVectorForValue(x_coords, x) == true && checkIntegerVectorForValue(y_coords, y) == true) {
-		return true;
+		return (true);
 	}
 	else
-	{
-		return false;
+	{	
+		return (false);
 	}
 }
 
@@ -241,11 +241,6 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 
 	for (int loop_number = 0;;loop_number++) {//temp placeholder in for loop
 
-		//<testcode>
-		std::cout << "loopOne - " << std::to_string(loopOne) << "\n";
-		loopOne++;
-		//</testcode>
-
 		//find the last vector in the vector list
 		int lastIndex = line_vectors_x.size() - 1;
 		
@@ -274,13 +269,9 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 		std::vector<int> previousVectorX = line_vectors_x.at(prevVectorIndex);
 		std::vector<int> previousVectorY = line_vectors_y.at(prevVectorIndex);
 
-		//create vector buffer
-		line_vectors_x.push_back(std::vector<int>());
-		line_vectors_y.push_back(std::vector<int>());
-
 		//vector buffer
-		std::vector<int> bufferVectorX = line_vectors_x.at(lastIndex);
-		std::vector<int> bufferVectorY = line_vectors_y.at(lastIndex);
+		std::vector<int> bufferVectorX;
+		std::vector<int> bufferVectorY;
 
 		//<testcode>
 		int loopTwo = 0;
@@ -288,12 +279,6 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 
 		for (int n = 0; n < spreadVectorX.size(); n++) {
 		
-			//<testcode>
-			std::cout << "loopTwo - " << std::to_string(loopTwo) << "\n";
-			loopTwo++;
-			//</testcode>
-
-
 			//get values of x and y at the point being evaluated
 			int x = spreadVectorX.at(n);
 			int y = spreadVectorY.at(n);
@@ -309,9 +294,9 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 					if (testCoordinateValue <= inkThreshold) {
 						// check that coordinates that we are checking has not already been evaluated, check coord buffer, spread_vector(list we are currently eval on) and previous coords
 						//note that nested ifs could be replaced by && statements, but are done like this to improve readability
-						if (checkForCoordinatesRepeat(spreadVectorX, spreadVectorY, testXCoordinate, testYCoordinate == false)) {
-							if (checkForCoordinatesRepeat(previousVectorX, previousVectorY, testXCoordinate, testYCoordinate == false)) {
-								if (checkForCoordinatesRepeat(bufferVectorX, bufferVectorY, testXCoordinate, testYCoordinate == false)) {
+						if (checkForCoordinatesRepeat(spreadVectorX, spreadVectorY, testXCoordinate, testYCoordinate) == false) {
+							if (checkForCoordinatesRepeat(previousVectorX, previousVectorY, testXCoordinate, testYCoordinate) == false) {
+								if (checkForCoordinatesRepeat(bufferVectorX, bufferVectorY, testXCoordinate, testYCoordinate) == false) {
 									bufferVectorX.push_back(testXCoordinate);
 									bufferVectorY.push_back(testYCoordinate);
 								}
@@ -325,6 +310,10 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 			}
 
 		}
+
+		line_vectors_x.push_back(bufferVectorX);
+		line_vectors_y.push_back(bufferVectorY);
+		
 	}
 
 	std::vector<std::vector<std::vector<int>>> returnVector = {line_vectors_x, line_vectors_y};
@@ -383,9 +372,12 @@ void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vecto
 			}
 			if (j == vectors.at(i).size() - 1) {
 				preStringChar[arrayIterator] = '\n';
+				arrayIterator++;
 			}
 		}
 	}
+
+	preStringChar[arrayIterator] = NULL;
 
 	std::cout << "done char_array";
 	std::string VectorOutputString = std::string(preStringChar);
