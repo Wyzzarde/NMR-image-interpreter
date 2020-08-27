@@ -217,11 +217,34 @@ void Bitmap::printMapToCSV (std::string filename) {
 }
 
 ////---------------------------------------------------------------------------------------------------------
+//CLASS:LINE
+
+//This class will intially only contain the coordinate vectors, but will hopefully later also contain
+//lines
+
+class Linemap {
+	public:
+		//Variables
+		std::vector<std::vector<int>> linemapX;
+		std::vector<std::vector<int>> linemapY;
+
+		//Functions
+		Linemap(std::vector<std::vector<int>> linemapx, std::vector<std::vector<int>> linemapy);
+
+};
+
+Linemap::Linemap(std::vector<std::vector<int>> linemapx, std::vector<std::vector<int>> linemapy) {
+	linemapX = linemapx;
+	linemapY = linemapY;
+}
+
+
+///---------------------------------------------------------------------------------------------------------
 //MoLS CODE
 
-//Detect contiguos black pixels. Output is 2 matrices (vector^2) contained in a vector. 
+//Detect contiguous black pixels. Output is 2 matrices (vector^2) contained in a vector. 
 
-std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
+Linemap test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 	//These vectors contain the x and y coordinates 
 	std::vector<std::vector<int>> line_vectors_x;
 	std::vector<std::vector<int>> line_vectors_y;
@@ -317,9 +340,10 @@ std::vector<std::vector<std::vector<int>>> test_line_detection (int initial_x, i
 		
 	}
 
-	std::vector<std::vector<std::vector<int>>> returnVector = {line_vectors_x, line_vectors_y};
+	Linemap returnLinemap(line_vectors_x, line_vectors_y);
 
-	return (returnVector);
+
+	return (returnLinemap);
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -389,9 +413,13 @@ std::vector<int> first_pixel_detect(Bitmap inputMap) {
 			}
 		}
 	}
+	return (std::vector<int> ());
 }
 
 //--------------------------------------------------------------------------------------------------------
+
+
+
 
 
 void testAlgorithms(Bitmap &map) {
@@ -421,10 +449,10 @@ int main()
 	firstXCoord = firstPixelCoord.at(0);
 	firstYCoord = firstPixelCoord.at(1);
 
-	std::vector<std::vector<std::vector<int>>> sq_vectors = test_line_detection(firstXCoord, firstYCoord, newMap);
+	Linemap sq_vectors = test_line_detection(firstXCoord, firstYCoord, newMap);
 	
-	std::vector<std::vector<int>> test_sqvectorX = sq_vectors.at(0);
-	std::vector<std::vector<int>> test_sqvectorY = sq_vectors.at(1);
+	std::vector<std::vector<int>> test_sqvectorX = sq_vectors.linemapX;
+	std::vector<std::vector<int>> test_sqvectorY = sq_vectors.linemapY;
 
 	//std::vector<std::vector<int>> test_sqvectorX, test_sqvectorY = test_line_detection(firstXCoord, firstYCoord, newMap);
 	
