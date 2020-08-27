@@ -10,7 +10,12 @@
 #include "test_header.h"
 #include <cerrno>
 
+//--------------------------------------------------------------------------------------------------
+//function declarations
+void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vectors);
+std::vector<int> first_pixel_detect(Bitmap inputMap);
 
+//--------------------------------------------------------------------------------------------------
 //global variables - yes they are evil. They are here so that they can be set by the user.
 // I am aware they should be values, but wth.
 
@@ -346,6 +351,41 @@ Linemap test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 	return (returnLinemap);
 }
 
+std::vector<Linemap> detectLinemaps(Bitmap& inputMap) {
+	
+	Bitmap inputMapCopy = inputMap;
+
+	std::vector<Linemap> linemapVector;
+
+	for (;;) {
+		std::vector<int> initial_pixels = first_pixel_detect(inputMapCopy);
+
+		if (initial_pixels.size() == 0) {
+			break;
+		}
+		
+		int initialXCoord = initial_pixels.at(0);
+		int initialYCoord = initial_pixels.at(1);
+
+		Linemap sq_vectors = test_line_detection(initialXCoord, initialYCoord, inputMap);
+
+		std::vector<std::vector<int>> lineMapX = sq_vectors.linemapX;
+		std::vector<std::vector<int>> lineMapY = sq_vectors.linemapY;
+	
+		for (int i = 0; i < lineMapX.size(); i++) {
+			for (int j = 0; j < lineMapX.at(i).size(), j++) {
+				int x = lineMapX.at(i).at(j);
+				int y = lineMapY.at(i).at(j);
+
+				inputMapCopy.bitmap_values.at(x).at(y) = 254;
+			}
+		}
+		
+		linemapVector.push_back(sq_vectors);
+	}
+}
+
+
 //--------------------------------------------------------------------------------------------------------
 //Utility functions
 
@@ -401,6 +441,7 @@ void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vecto
 	outFile << VectorOutputString;
 	outFile.close();
 }
+
 std::vector<int> first_pixel_detect(Bitmap inputMap) {
 	for (int x = 0; x < inputMap.width; x++) {
 		//std::cout << std::to_string(x) << "\n";
@@ -413,7 +454,10 @@ std::vector<int> first_pixel_detect(Bitmap inputMap) {
 			}
 		}
 	}
-	return (std::vector<int> ());
+
+	std::vector<int> empty = {};
+
+	return (empty);
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -453,11 +497,8 @@ int main()
 	
 	std::vector<std::vector<int>> test_sqvectorX = sq_vectors.linemapX;
 	std::vector<std::vector<int>> test_sqvectorY = sq_vectors.linemapY;
-
-	//std::vector<std::vector<int>> test_sqvectorX, test_sqvectorY = test_line_detection(firstXCoord, firstYCoord, newMap);
 	
-	printVectorsToCSV("output_line_vectorX.csv", test_sqvectorX);
-	printVectorsToCSV("output_line_vectorY.csv", test_sqvectorY);
+	
 
 }
 
