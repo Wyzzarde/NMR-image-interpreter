@@ -10,9 +10,11 @@
 #include "test_header.h"
 #include <cerrno>
 
+
 //--------------------------------------------------------------------------------------------------
-//function declarations
+//function and class declarations
 void printVectorsToCSV(std::string filename, std::vector<std::vector<int>> vectors);
+class Bitmap;
 std::vector<int> first_pixel_detect(Bitmap inputMap);
 
 //--------------------------------------------------------------------------------------------------
@@ -351,29 +353,35 @@ Linemap test_line_detection (int initial_x, int initial_y, Bitmap inputMap) {
 	return (returnLinemap);
 }
 
+//--------------------------------------------------------------------------------------------------------
+
 std::vector<Linemap> detectLinemaps(Bitmap& inputMap) {
 	
 	Bitmap inputMapCopy = inputMap;
 
 	std::vector<Linemap> linemapVector;
 
-	for (;;) {
-		std::vector<int> initial_pixels = first_pixel_detect(inputMapCopy);
+	for (;;) {//this loop will loop through a series of black pixel blocks, and will attempt to detect linemaps
+		// a linemap is defined as a matrix that will 
+		
+		std::vector<int> initial_pixels = first_pixel_detect(inputMapCopy);//returns a vector with x,y coordinates of first detected black pixel.
 
-		if (initial_pixels.size() == 0) {
+		if (initial_pixels.size() == 0) {//check that there were black pixels detected
 			break;
 		}
 		
+		//initial pixels of block
 		int initialXCoord = initial_pixels.at(0);
 		int initialYCoord = initial_pixels.at(1);
 
-		Linemap sq_vectors = test_line_detection(initialXCoord, initialYCoord, inputMap);
+		Linemap sq_vectors = test_line_detection(initialXCoord, initialYCoord, inputMap);//get all the x and y coordinates of this block of black pixels. Input - initial x and y coordinates, input map-
+		//- is the map to explore on.
 
 		std::vector<std::vector<int>> lineMapX = sq_vectors.linemapX;
 		std::vector<std::vector<int>> lineMapY = sq_vectors.linemapY;
 	
 		for (int i = 0; i < lineMapX.size(); i++) {
-			for (int j = 0; j < lineMapX.at(i).size(), j++) {
+			for (int j = 0; j < lineMapX.at(i).size(); j++) {
 				int x = lineMapX.at(i).at(j);
 				int y = lineMapY.at(i).at(j);
 
@@ -383,6 +391,8 @@ std::vector<Linemap> detectLinemaps(Bitmap& inputMap) {
 		
 		linemapVector.push_back(sq_vectors);
 	}
+
+	return (linemapVector);
 }
 
 
@@ -497,7 +507,11 @@ int main()
 	
 	std::vector<std::vector<int>> test_sqvectorX = sq_vectors.linemapX;
 	std::vector<std::vector<int>> test_sqvectorY = sq_vectors.linemapY;
-	
+
+	for (int i = 0; i < test_sqvectorX.size(); i++) {
+		int temp_int = test_sqvectorX.at(i);
+		std::cout << std::to_string(temp_int);
+	}
 	
 
 }
